@@ -1,0 +1,56 @@
+.dashboard-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+  padding: 20px;
+}
+
+.table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table th {
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+@media (max-width: 576px) {
+  .dashboard-container {
+    padding: 10px;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  .table th,
+  .table td {
+    font-size: 0.8rem;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 992px) {
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  .table th,
+  .table td {
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 993px) {
+  h2 {
+    font-size: 1.8rem;
+  }
+}

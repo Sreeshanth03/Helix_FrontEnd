@@ -1,0 +1,36 @@
+.userform-container {
+  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+}
+
+@media (max-width: 576px) {
+  .card {
+    padding: 20px;
+    margin-top: 30px;
+  }
+  h3 {
+    font-size: 1.4rem;
+  }
+  button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 992px) {
+  .card {
+    margin-top: 50px;
+  }
+  h3 {
+    font-size: 1.6rem;
+  }
+}
+
+@media (min-width: 993px) {
+  .card {
+    margin-top: 70px;
+  }
+  h3 {
+    font-size: 1.8rem;
+  }
+}
