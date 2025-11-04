@@ -10,18 +10,19 @@ import {
   Row,
   Col,
   Card,
+  Alert,
 } from "react-bootstrap";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import "./UserDashBoard.css";
 
 const UsersDashBoard = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [search, setSearch] = useState("");
+  const [duplicateMessage, setDuplicateMessage] = useState("");
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-  // Fetch all users
   useEffect(() => {
     async function fetchUsers() {
       try {
@@ -29,6 +30,16 @@ const UsersDashBoard = () => {
           "https://helix1-14nt.onrender.com/userform/Getalluser"
         );
         const userData = response.data.data || [];
+
+        const duplicates = findDuplicates(userData);
+        if (duplicates.length > 0) {
+          setDuplicateMessage(
+            `Warning: Duplicate email or mobile entries found for → ${duplicates.join(", ")}`
+          );
+        } else {
+          setDuplicateMessage("");
+        }
+
         setUsers(userData);
         setFilteredUsers(userData);
       } catch (error) {
@@ -38,7 +49,32 @@ const UsersDashBoard = () => {
     fetchUsers();
   }, []);
 
-  //  Handle search
+  // Detect duplicates by email or mobile
+  const findDuplicates = (userData) => {
+    const emailMap = new Map();
+    const mobileMap = new Map();
+    const duplicates = [];
+
+    userData.forEach((user) => {
+      if (user.email) {
+        if (emailMap.has(user.email)) {
+          duplicates.push(`${user.name || "Unknown"} (Email: ${user.email})`);
+        } else {
+          emailMap.set(user.email, true);
+        }
+      }
+      if (user.mobile) {
+        if (mobileMap.has(user.mobile)) {
+          duplicates.push(`${user.name || "Unknown"} (Mobile: ${user.mobile})`);
+        } else {
+          mobileMap.set(user.mobile, true);
+        }
+      }
+    });
+
+    return duplicates;
+  };
+
   const handleFilter = (e) => {
     const value = e.target.value.toLowerCase();
     setSearch(value);
@@ -61,7 +97,6 @@ const UsersDashBoard = () => {
     setFilteredUsers(filtered);
   };
 
-  // Download Excel
   const downloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(filteredUsers);
     const workbook = XLSX.utils.book_new();
@@ -79,8 +114,6 @@ const UsersDashBoard = () => {
   return (
     <Container className="dashboard-container">
       <Card className="shadow-lg p-4 mt-4 rounded-4">
-        
-        {/*  Title Section */}
         <div className="text-center mb-4">
           <h2 className="fw-bold text-primary">User Dashboard</h2>
           <h5 className="text-muted">
@@ -88,14 +121,18 @@ const UsersDashBoard = () => {
           </h5>
         </div>
 
-        {/*  Back Button */}
         <div className="text-start mb-3">
           <Button variant="secondary" onClick={() => navigate("/")}>
             ← Back
           </Button>
         </div>
 
-        {/* Search Bar and Button */}
+        {duplicateMessage && (
+          <Alert variant="danger" className="text-center fw-bold">
+            {duplicateMessage}
+          </Alert>
+        )}
+
         <Row className="mb-3 justify-content-center text-center">
           <Col xs={12} md={8} lg={6}>
             <Form.Control
@@ -113,7 +150,6 @@ const UsersDashBoard = () => {
           </Col>
         </Row>
 
-        {/*  User Table */}
         {filteredUsers.length === 0 ? (
           <p className="text-center text-muted">No users found.</p>
         ) : (

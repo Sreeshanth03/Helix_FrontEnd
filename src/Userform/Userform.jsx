@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button, Container, Row, Col, Card } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, Card, Alert } from "react-bootstrap";
 import axios from "axios";
 import "./Userform.css";
 
@@ -12,23 +12,39 @@ const Userform = () => {
     country: "",
   });
 
+  const [alertMessage, setAlertMessage] = useState(""); // for showing alerts
+  const [alertType, setAlertType] = useState("success"); // success or danger
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setAlertMessage(""); // clear old alerts
+
     try {
       const res = await axios.post(
         "https://helix1-14nt.onrender.com/userform/createform",
         formData
       );
-      alert(" Form submitted successfully!");
+
+      setAlertType("success");
+      setAlertMessage("✅ Form submitted successfully!");
       console.log("Response:", res.data);
+
       setFormData({ name: "", mobile: "", email: "", address: "", country: "" });
     } catch (error) {
       console.error("Error:", error);
-      alert(" Failed to submit form");
+
+      if (error.response && error.response.status === 409) {
+        // Handle duplicate error (409 from backend)
+        setAlertType("danger");
+        setAlertMessage("⚠️ Duplicate entry found! Email or Mobile already exists.");
+      } else {
+        setAlertType("danger");
+        setAlertMessage("❌ Failed to submit form. Please try again.");
+      }
     }
   };
 
@@ -38,6 +54,19 @@ const Userform = () => {
         <Col xs={12} sm={10} md={8} lg={6}>
           <Card className="shadow-lg p-4 mt-5 rounded-4">
             <h3 className="text-center mb-4 fw-bold text-primary">User Form</h3>
+
+            {/* ✅ Alert message shown here */}
+            {alertMessage && (
+              <Alert
+                variant={alertType}
+                className="text-center fw-semibold"
+                onClose={() => setAlertMessage("")}
+                dismissible
+              >
+                {alertMessage}
+              </Alert>
+            )}
+
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3">
                 <Form.Label>Full Name</Form.Label>
